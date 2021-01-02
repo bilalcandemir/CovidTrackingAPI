@@ -1,0 +1,131 @@
+syntax = "proto3";
+package covidtracking;
+
+service covidtracking {
+    rpc doctorProfessions (professionRequest) returns (professionResponse) {}
+    rpc city (cityRequest) returns (cityResponse) {}
+    rpc hospital (hospitalRequest) returns (hospitalResponse) {}
+    rpc doctorList (doctorListRequest) returns (doctorListResponse) {}
+    rpc userLogin (userLoginRequest) returns (userLoginResponse) {}
+    rpc getUserData (getUserRequest) returns (getUserResponse) {}
+    rpc calculateBMI (bmiRequest) returns (bmiResponse){}
+    rpc signUp (signUpRequest) returns (signUpResponse){}
+    rpc getPin (pinRequest) returns (pinResponse) {}
+    rpc safeArea (safeAreaRequest) returns (safeAreaResponse) {}
+}
+
+message professionRequest {
+    int32 professionId = 1;
+}
+
+message professionResponse {
+    string professionName = 2;
+}
+
+message cityRequest {
+    int32 cityId = 1;
+}
+
+message cityResponse {
+    string cityName = 1;
+    float cityLatitude = 2;
+    float cityLongitude = 3;
+}
+
+message hospitalRequest {
+    int32 cityId = 1;
+}
+
+message hospitalResponse {
+    string hospitalName = 1;
+    float hospitalLatitude = 2;
+    float hospitalLongitude = 3;
+}
+
+message doctorListRequest {
+    int32 doctorId = 1;
+}
+
+message doctorListResponse {
+    string doctorName = 1;
+    string doctorSurname = 2;
+    string hospitalName = 3;
+    string professionName = 4;
+}
+
+message userLoginRequest {
+    int64 identityNo = 1;
+    string password = 2;
+}
+
+message userLoginResponse {
+    string token = 1;
+}
+
+message getUserRequest {
+    string userId = 1;
+}
+
+message getUserResponse {
+    string name = 1;
+    string surname = 2;
+    bool gender = 3;
+    int32 age = 4;
+    float weight = 5;
+    float height = 6;
+    float bmi = 7;
+    float addressLatitude = 8;
+    float addressLongitude = 9;
+    int64 mobileNumber = 10;
+    string selectedDoctorName = 11;
+}
+
+message bmiRequest {
+    int64 userId = 1;
+    float weight = 2;
+    float height = 3;
+}
+
+message bmiResponse {}
+
+message signUpRequest {
+    string name = 1;
+    string surname = 2;
+    bool gender = 3;
+    int32 age = 4;
+    float weight = 5;
+    float height = 6;
+    float addressLatitude = 8;
+    float addressLongitude = 9;
+    int64 mobileNumber = 10;
+    string selectedDoctorName = 11;
+    bool meritialStatus = 12;
+    bool workHealthSector = 13;
+    int64 userId = 14;
+    int64 identityNo = 15;
+    string password = 16;
+}
+
+message signUpResponse {
+    string signupMessage = 1;
+}
+
+message pinRequest {
+
+}
+
+message pinResponse {
+
+}
+
+message safeAreaRequest {
+    float currentLatitude = 1;
+    float currentLongitude = 2;
+    float distance = 3;
+}
+
+message safeAreaResponse {
+    string status = 1;
+    string pinColor = 2;
+    int32 peopleCount = 3;
+}
