@@ -22,7 +22,6 @@ var tracking_proto = grpc.loadPackageDefinition(packageDefinition)
 
 function doctorProfessions(call, callback) {
   var id = call.request.professionId;
-
   knex
     .select("professionName")
     .from("profession")
@@ -50,7 +49,6 @@ function city(call, callback) {
 }
 
 function hospital(call, callback) {
-  getuserMesela();
   knex
     .select("*")
     .from("hospital")
@@ -173,201 +171,105 @@ function signUp(call, callback) {
     .then(callback(null));
 }
 
-//Olay budur ikinci bir for açmamız gerekecek
-async function getuserMesela(){
-  var users = [1,4];
-  var testArray = [];
-  for (let i = 0; i < users.length; i++) {
-    await knex.select('userId', 'probabilityValue','lastTestDate').from('test').where('userId', users[i]).then((data)=>{
-      for (let y = 0; y < data.length; y++) {
-        testArray.push(data[y].probabilityValue)
-      }
-    })
-  }
-  console.log(testArray);
-  
-}
 
 
-
-function getPin(call, callback) {}
-/*
-Kullanıcının safeArea bölmesine girdiğinde yakınında olan insanların son test zamanlarına ve bu testin sonucuna göre
-bir pinColor ve status gönderen SQL Query
-*/
-async function safeArea(call, callback) {
-  var testCount;
-  //this function need userId
+const findDistance = async (distance, latitude, longitude) => {
+  var users = [];
   await knex
-    .count("userId as CNT")
-    .from("test")
-    .then((counterData) => {
-      testCount = counterData[0].CNT;
-      console.log(testCount);
-      return testCount;
-    });
-
-   await knex
     .select("userId", "currentLatitude", "currentLongitude")
     .from("safearea")
     .then((data) => {
-      var counter = 0;
-      var users = [];
-
       for (let i = 0; i < data.length; i++) {
         //Calculate distance metres with Users CurrentLatitude and CurrentLongitude
         var R = 6371e3; // metres
-        var φ1 = (call.request.currentLatitude * Math.PI) / 180; // φ, λ in radians lat1
+        var φ1 = (latitude * Math.PI) / 180; // φ, λ in radians lat1
         var φ2 = (data[i].currentLatitude * Math.PI) / 180; //lat2
-        var Δφ =
-          ((data[i].currentLatitude - call.request.currentLatitude) * Math.PI) /
-          180; //(lat2-lat1)
-        var Δλ =
-          ((data[i].currentLongitude - call.request.currentLongitude) *
-            Math.PI) /
-          180; //(lon2-lon1)
+        var Δφ = ((data[i].currentLatitude - latitude) * Math.PI) / 180; //(lat2-lat1)
+        var Δλ = ((data[i].currentLongitude - longitude) * Math.PI) / 180; //(lon2-lon1)
         var a =
           Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
           Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         var d = R * c; // in metres
-
-        //To access test results for users in the distance
-
-
-
         //Learn How many people in distance
-        if (call.request.distance >= d) {
+        if (distance >= d) {
           //Just add users in the area
           users.push(data[i].userId);
-          counter++;
         }
-        console.log(users);
-      }
-
-      if (counter == 0){
-        callback(null, {
-          status: "You are in safe",
-          pinColor: "#FFFFFF",
-          peopleCount: counter,
-        });
-      }
-      //usersın içindeki id ye göre bütün test sonuçlarını bir arrayde tutup onun sayısına göre döndürürsem olur.
-
-      if (testCount != 0) {
-        //Check last test date for callback the pins.
-        //Bütün insanların testlerine bakıyorum mal gibi bütün insanların değil sadece çevrede olan insanlarınki gerekiyor.
-        for (let y = 0; y < testCount; y++) {
-          knex
-            .select("userId", "lastTestDate")
-            .from("test")
-            .then((testData) => {
-              var time = new Date();
-              var differentTime = Math.abs(time - testData[y].lastTestDate);
-              var differentDays = Math.ceil(
-                differentTime / (1000 * 60 * 60 * 24)
-              );
-              console.log(testData);
-
-              //If users distance has people who has Covid-19 test 10 day ago
-              //
-              if (differentDays <= 10) {
-                knex
-                  .select("probabilityValue")
-                  .from("test")
-                  .where("userId", testData[y].userId)
-                  .then((probabilityData) => {
-                    console.log(probabilityData);
-                    //Has test and his test Result, callback pins
-                    if (probabilityData[0].probabilityValue >= 90) {
-                      knex
-                        .select("pinColor", "status")
-                        .from("pin")
-                        .where("pinId", 1)
-                        .then((pinData) => {
-                          callback(null, {
-                            status: pinData[0].status,
-                            pinColor: pinData[0].pinColor,
-                            peopleCount: counter,
-                          });
-                        });
-                    } else if (probabilityData[0].probabilityValue >= 70) {
-                      knex
-                        .select("pinColor", "status")
-                        .from("pin")
-                        .where("pinId", 2)
-                        .then((pinData) => {
-                          callback(null, {
-                            status: pinData[0].status,
-                            pinColor: pinData[0].pinColor,
-                            peopleCount: counter,
-                          });
-                        });
-                    } else if (probabilityData[0].probabilityValue >= 50) {
-                      knex
-                        .select("pinColor", "status")
-                        .from("pin")
-                        .where("pinId", 3)
-                        .then((pinData) => {
-                          callback(null, {
-                            status: pinData[0].status,
-                            pinColor: pinData[0].pinColor,
-                            peopleCount: counter,
-                          });
-                        });
-                    }
-                    else {
-                      knex
-                        .select("pinColor", "status")
-                        .from("pin")
-                        .where("pinId", 2)
-                        .then((pinData) => {
-                          callback(null, {
-                            status: pinData[0].status,
-                            pinColor: pinData[0].pinColor,
-                            peopleCount: counter,
-                          });
-                        });
-                    }
-                  });
-                  //Bundada test sonuçlarına bakmalıyız. Sadece eskiden pozitif olanlara baksak yeter
-              } else if (differentDays <= 20) {
-                knex
-                  .select("pinColor", "status")
-                  .from("pin")
-                  .where("pinId", 4)
-                  .then((pinData) => {
-                    callback(null, {
-                      status: pinData[0].status,
-                      pinColor: pinData[0].pinColor,
-                      peopleCount: counter,
-                    });
-                  });
-              } else {
-                knex
-                  .select("pinColor", "status")
-                  .from("pin")
-                  .where("pinId", 5)
-                  .then((pinData) => {
-                    callback(null, {
-                      status: pinData[0].status,
-                      pinColor: pinData[0].pinColor,
-                      peopleCount: counter,
-                    });
-                  });
-              }
-            });
-        }
-      } else {
-        callback(null, {
-          status: "You are in safe",
-          pinColor: "#FFFFFF",
-          peopleCount: counter,
-        });
       }
     });
-}
+  return users;
+};
 
+
+const distanceUsers = async (users) => {
+  var testArray = [];
+  for (let i = 0; i < users.length; i++) {
+    await knex
+      .select("userId", "probabilityValue", "lastTestDate")
+      .from("test")
+      .where("userId", users[i])
+      .then((data) => {
+        console.log(data);
+        for (let y = 0; y < data.length; y++) {
+
+          var time = new Date();
+          var differentTime = Math.abs(time - data[y].lastTestDate);
+          var differentDays = Math.ceil(differentTime / (1000 * 60 * 60 * 24));
+
+          if (differentDays <= 10) {
+            console.log(data[y].probabilityValue);
+            if (data[y].probabilityValue >= 75) {
+              testArray.push(1);
+            }
+             else if (data[y].probabilityValue >= 60) {
+              testArray.push(3);
+            }
+             else {
+              testArray.push(3);
+            }
+          }
+          else if (differentDays <= 20){
+            testArray.push(5);
+          }
+        }
+      });
+  }
+  return testArray;
+};
+
+async function safeArea(call, callback) {
+
+  const findDistanceUserArray = await findDistance(
+    call.request.distance,
+    call.request.currentLatitude,
+    call.request.currentLongitude
+  );
+  console.log(findDistanceUserArray);
+
+  const findLastTestArray = await distanceUsers(findDistanceUserArray);
+  console.log(findLastTestArray);
+  findLastTestArray.sort(function(a, b) {
+    return a - b;
+  });
+  if (findLastTestArray.length != 0){
+    if (findLastTestArray[0] == 1){
+      callback(null, {status: "There are some peoples in your area who has Covid-19 test result is Positive", pinColor:"#FF0000", peopleCount:findDistanceUserArray.length})
+    }
+    else if (findLastTestArray[0] == 2){
+      callback(null, {status: "You are int the Safe Zone.", pinColor:"#00FF00", peopleCount:findDistanceUserArray.length})
+    }
+    else if (findLastTestArray[0] == 3){
+      callback(null, {status: "There are people in your area but the test results are negative", pinColor:"#FFFFFF", peopleCount:findDistanceUserArray.length})
+    }
+    else if (findLastTestArray[0] == 4){
+      callback(null, {status: "There are people around you who havent been tested in a long time", pinColor:"#103FF2", peopleCount:findDistanceUserArray.length})
+    }
+    else if (findLastTestArray[0] == 5){
+      callback(null, {status: "There are people around you who havent been Covid-19 Test", pinColor:"#000000", peopleCount:findDistanceUserArray.length})
+    }
+  }
+}
 
 function main() {
   var server = new grpc.Server();

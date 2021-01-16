@@ -10,7 +10,7 @@ exports.seed = function(knex) {
         //tarihi 12-30 ayarlayınca patlıyor aq :D
         //büyük ihtimalle 10 günün altında kalan test olunca giriyor fakat userId si farklı bir değer 
         //gösterdiği için olmuyor...
-        {userId: 4, suggestionId: 2, probabilityValue: 57.8, lastTestDate: '2020-12-23'}
+        {userId: 1, suggestionId: 2, probabilityValue: 97.8, lastTestDate: '2021-01-12'}
       ]);
     });
 };

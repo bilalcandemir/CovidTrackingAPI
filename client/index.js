@@ -57,10 +57,11 @@ const doctorList = (req, res) => {
 };
 
 const userLogin = (req, res) => {
-  const payload = { identityNo: 31699996800, password: 75650 };
+  const payload = { identityNo: 31699996800, password: 756500 };
   client.userLogin(payload, function (err, response) {
     if (response.token != "0") {
       console.log("Login is Success here is the Token:");
+      console.log(response);
       console.log(response.token);
     } else {
       console.log("Identity Number or Your Password is Wrong");
