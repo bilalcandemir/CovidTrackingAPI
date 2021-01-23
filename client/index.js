@@ -122,6 +122,81 @@ const safeArea = (req, res) => {
   })
 }
 
+const UserDisease = (req, res) => {
+  const payload = {
+    pneumonia: true,
+      covid: true,
+      sars: false,
+      careUnit: false,
+      chronicLung: false,
+      diabetes: true,
+      hypertension: false,
+      chronicLiver: false,
+      chronicKidney: false,
+      chronicHearth: false,
+      geneticDisorder: false,
+      bloodCancer: false,
+      otherCancer: false,
+      takeChemotherapy: false,
+      systemDisorder: false,
+      takePainkiller: false,
+      takeCortisoneDrug: false,
+      thalassemia: false,
+  };
+  client.UserDisease(payload, function (err, response){
+    if (err) {
+      res.json(err);
+    }
+    else {
+      res.json(response);
+    }
+  })
+};
+
+const covidTest = (req, res) => {
+  const payload = {
+    userId:1,
+      abdominalPain: 1,
+      anorexia: 1,
+      bluishFace: 2,
+      bodyAches: 3,
+      chestPain: 1,
+      repeatedShaking: 2,
+      confusion: 1,
+      delirium: 2,
+      diarrhea: 3,
+      dizziness: 1,
+      weakness: 1,
+      fever: 37.8,
+      feeling: 1,
+      headache: 1,
+      hoarseVoice: 1,
+      lossTasteAndSmell: 2,
+      musclePain: 1,
+      runnyNose: 1,
+      nasalStuffiness: 1,
+      nausea: 1,
+      ocularReaction: 2,
+      persistentCough: 1,
+      rhinorrhea: 1,
+      shortnessBreath: 1,
+      skinRush: 2,
+      skippedMeals: 1,
+      sneeze: 1,
+      soreThroat: 2,
+      sputum: 1,
+      vomiting: 1,
+  };
+  client.covidTest(payload, function (err, response){
+    if (err) {
+      res.json(err);
+    }
+    else {
+      res.json(response);
+    }
+  })
+};
+
 function main() {}
 main();
 
@@ -134,5 +209,7 @@ module.exports = {
   getUserData,
   calculateBMI,
   signUp,
-  safeArea
+  safeArea,
+  UserDisease,
+  covidTest
 };

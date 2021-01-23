@@ -271,6 +271,121 @@ async function safeArea(call, callback) {
   }
 }
 
+async function UserDisease (call, callback){
+  await knex("userdisease")
+    .insert({
+      ards: call.request.ards,
+      pneumonia: call.request.pneumonia,
+      covid: call.request.covid,
+      sars: call.request.sars,
+      careUnit: call.request.careUnit,
+      chronicLung: call.request.chronicLung,
+      diabetes: call.request.diabetes,
+      hypertension: call.request.hypertension,
+      chronicLiver: call.request.chronicLiver,
+      chronicKidney: call.request.chronicKidney,
+      chronicHearth: call.request.chronicHearth,
+      geneticDisorder: call.request.geneticDisorder,
+      bloodCancer: call.request.bloodCancer,
+      otherCancer: call.request.otherCancer,
+      takeChemotherapy: call.request.takeChemotherapy,
+      systemDisorder: call.request.systemDisorder,
+      takePainkiller: call.request.takePainkiller,
+      takeCortisoneDrug: call.request.takeCortisoneDrug,
+      thalassemia: call.request.thalassemia,
+    }).where("userdisease.userId", call.request.userId)
+    .then(callback(null, {status:"Successfully"}));
+}
+
+async function covidTest (call, callback){
+
+  const findUserGenderAge = await userGenderAge(call.request.userId);
+  console.log(findUserGenderAge);
+
+  var probabilityValue;
+
+  await knex("symptom").insert({
+    symptomId: 16, //Could be a random number.
+      abdominalPain: call.request.abdominalPain,
+      anorexia: call.request.anorexia,
+      bluishFace: call.request.bluishFace,
+      bodyAches: call.request.bodyAches,
+      chestPain: call.request.chestPain,
+      repeatedShaking: call.request.repeatedShaking,
+      confusion: call.request.confusion,
+      delirium: call.request.delirium,
+      diarrhea: call.request.diarrhea,
+      dizziness: call.request.dizziness,
+      weakness: call.request.weakness,
+      fever: call.request.fever,
+      feeling: call.request.feeling,
+      headache: call.request.headache,
+      hoarseVoice: call.request.hoarseVoice,
+      lossTasteAndSmell: call.request.lossTasteAndSmell,
+      musclePain: call.request.musclePain,
+      runnyNose: call.request.runnyNose,
+      nasalStuffiness: call.request.nasalStuffiness,
+      nausea: call.request.nausea,
+      ocularReaction: call.request.ocularReaction,
+      persistentCough: call.request.persistentCough,
+      rhinorrhea: call.request.rhinorrhea,
+      shortnessBreath: call.request.shortnessBreath,
+      skinRush: call.request.skinRush,
+      skippedMeals: call.request.skippedMeals,
+      sneeze: call.request.sneeze,
+      soreThroat: call.request.soreThroat,
+      sputum: call.request.sputum,
+      vomiting: call.request.vomiting,
+  }).where("symptom.userId", call.request.userId).then(()=>{
+    var gender;
+    var lossSmell;
+    var cough;
+    var weakness;
+    if(findUserGenderAge[0].gender){
+      gender = 1;
+    }
+    else {
+      gender = 0;
+    }
+
+    if (call.request.lossTasteAndSmell != 0){
+      lossSmell = 1;
+    }
+    else {
+      lossSmell = 0;
+    }
+
+    if (call.request.persistentCough == 3){
+      cough = 1;
+    }
+    else {
+      cough = 0;
+    }
+    if (call.request.weakness == 3){
+      weakness = 1;
+    }
+    else {
+      weakness = 0;
+    }
+    
+    var x = -1.32 - (0.01 * findUserGenderAge[0].age) + (0.44 * gender) + (1.75 * lossSmell) + (0.31 * cough) + (0.49 * weakness);
+    var exp = Math.exp(x);
+    console.log(x);
+    probabilityValue = exp/(1+exp);
+    console.log(probabilityValue);
+  }
+  )
+}
+// = −1.32 − (0.01 𝑥 𝑎𝑔𝑒) + (0.44 𝑥 𝑠𝑒𝑥) + (1.75 𝑥 𝑙𝑜𝑠𝑠 𝑜𝑓 𝑠𝑚𝑒𝑙𝑙 & 𝑡𝑎𝑠𝑡𝑒) + (0.31 𝑥 𝑠𝑒𝑣𝑒𝑟𝑒 𝑝𝑒𝑟𝑠𝑖𝑠𝑡𝑒𝑛𝑡 𝑐𝑜𝑢𝑔h) + (0.49 𝑥 𝑠𝑒𝑣𝑒𝑟𝑒 𝑓𝑎𝑡𝑖𝑔𝑢𝑒)
+// + (0.39 𝑥 𝑠𝑘𝑖𝑝𝑝𝑒𝑑 𝑚𝑒𝑎𝑙𝑠)
+const userGenderAge = async (userId) => {
+  var userData = [];
+  await knex.select('gender','age').from('myuser').where('userId',userId).then((data)=>{
+    userData = data;
+  })
+  return userData;
+};
+
 function main() {
   var server = new grpc.Server();
   server.addService(tracking_proto.covidtracking.service, {
@@ -283,6 +398,8 @@ function main() {
     calculateBMI,
     signUp,
     safeArea,
+    UserDisease,
+    covidTest
   });
   server.bind("0.0.0.0:50051", grpc.ServerCredentials.createInsecure());
   server.start();

@@ -10,8 +10,11 @@ router.get('/doctorList', grpcRoutes.doctorList);
 router.get('/userLogin', grpcRoutes.userLogin);
 router.get('/getUserData', grpcRoutes.getUserData);
 router.get('/calculateBMI', grpcRoutes.calculateBMI);
-router.get('/signUp', grpcRoutes.signUp)
-router.get('/safeArea', grpcRoutes.safeArea)
+router.get('/signUp', grpcRoutes.signUp);
+router.get('/safeArea', grpcRoutes.safeArea);
+router.get('/userDisease', grpcRoutes.UserDisease);
+router.get('/covidTest', grpcRoutes.covidTest);
+
 //router.post('/upload',)
 
 module.exports = router;
