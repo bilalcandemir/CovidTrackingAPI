@@ -32,6 +32,24 @@ exports.seed = function (knex) {
           hospitalId: 1,
           professionId: 1,
         },
+        {
+          doctorId: 4,
+          identityNo: 10987654321,
+          name: "Mesut",
+          surname: "DUKAN",
+          image: "doctorMesut.jpg",
+          hospitalId: 4,
+          professionId: 1,
+        },
+        {
+          doctorId: 5,
+          identityNo: 10987654321,
+          name: "Mesut",
+          surname: "DUKAN",
+          image: "doctorMesut.jpg",
+          hospitalId: 5,
+          professionId: 1,
+        },
       ]);
     });
 };

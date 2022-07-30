@@ -16,8 +16,6 @@ exports.seed = function (knex) {
           weight: 62.4,
           height: 1.74,
           bmi: 3.24,
-          addressLatitude: 32.45264,
-          addressLongitude: 27.8763,
           mobileNumber: 5432986291,
           meritialStatus: false,
           workHealthSector: false,

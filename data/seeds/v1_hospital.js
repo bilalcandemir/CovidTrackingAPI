@@ -5,8 +5,11 @@ exports.seed = function(knex) {
     .then(function () {
       // Inserts seed entries
       return knex('hospital').insert([
-        {hospitalId:1 ,hospitalName: "Ümraniye Devlet Hastanesi", cityId: 1, hospitalLatitude: 41.0320085 , hospitalLongitude: 29.1021202},
-        {hospitalId:2 ,hospitalName: "Dr. Burhan Nalbantoğlu Devlet Hastanesi", cityId: 2, hospitalLatitude: 35.2051037 , hospitalLongitude: 33.3308184}
+        {hospitalId:1 ,hospitalName: "Ümraniye Devlet Hastanesi", townId: 2},
+        {hospitalId:2 ,hospitalName: "Tuzla Devlet Hastanesi", townId: 2},
+        {hospitalId:3 ,hospitalName: "Pendik Devlet Hastanesi", townId: 2},
+        {hospitalId:4 ,hospitalName: "Pendik Devlet Hastanesi", townId: 3},
+        {hospitalId:5 ,hospitalName: "Pendik Devlet Hastanesi", townId: 3}
       ]);
     });
 };

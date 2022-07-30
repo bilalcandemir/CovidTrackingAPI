@@ -6,15 +6,23 @@ exports.up = function (knex) {
       table.float("cityLatitude", 14, 10);
       table.float("cityLongitude", 14, 10);
     })
-    .createTable("hospital", (table) => {
-      table.increments("hospitalId");
-      table.string("hospitalName").notNullable();
-      table.float("hospitalLatitude", 14, 10);
-      table.float("hospitalLongitude", 14, 10);
-      table.integer("cityId").unsigned();
+    .createTable("town", (table) => {
+      table.integer("cityId");
+      table.increments("townId");
+      table.string("townName");
       table
         .foreign("cityId")
         .references("city.cityId")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
+    })
+    .createTable("hospital", (table) => {
+      table.increments("hospitalId");
+      table.string("hospitalName").notNullable();
+      table.integer("townId").unsigned();
+      table
+        .foreign("townId")
+        .references("town.townId")
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
     })
@@ -52,8 +60,7 @@ exports.up = function (knex) {
       table.float("weight");
       table.float("height");
       table.float("bmi");
-      table.float("addressLatitude", 14, 10);
-      table.float("addressLongitude", 14, 10);
+      table.integer("townId");
       table.bigInteger("mobileNumber");
       table.boolean("meritialStatus");
       table.boolean("workHealthSector");
@@ -61,6 +68,11 @@ exports.up = function (knex) {
       table
         .foreign("selectedDoctorId")
         .references("doctor.doctorId")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
+      table
+        .foreign("townId")
+        .references("town.townId")
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
     })
@@ -160,8 +172,8 @@ exports.up = function (knex) {
       table.integer("userId").unsigned();
       table.integer("symptomId").unsigned();
       table.integer("suggestionId").unsigned();
-      table.float('probabilityValue');
-      table.date("lastTestDate")
+      table.float("probabilityValue");
+      table.date("lastTestDate");
       table
         .foreign("userId")
         .references("myuser.userId")
@@ -182,7 +194,7 @@ exports.up = function (knex) {
       table.integer("userId").unsigned();
       table.integer("doctorId").unsigned();
       table.date("testDate");
-      table.integer("probablityValue");
+      table.float("probablityValue");
       table
         .foreign("userId")
         .references("myuser.userId")
@@ -211,16 +223,17 @@ exports.up = function (knex) {
         .references("symptom.symptomId")
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
-    }).createTable('denemeStorage', (table) => {
-      table.integer('id');
-      table.string('name');
-      table.string('image');
     })
+    .createTable("denemeStorage", (table) => {
+      table.integer("id");
+      table.string("name");
+      table.string("image");
+    });
 };
 
 exports.down = function (knex) {
   return knex.schema
-  .dropTableIfExists("denemeStorage")
+    .dropTableIfExists("denemeStorage")
     .dropTableIfExists("record")
     .dropTableIfExists("history")
     .dropTableIfExists("test")
@@ -233,5 +246,6 @@ exports.down = function (knex) {
     .dropTableIfExists("doctor")
     .dropTableIfExists("profession")
     .dropTableIfExists("hospital")
+    .dropTableIfExists("town")
     .dropTableIfExists("city");
 };
