@@ -22,4 +22,4 @@ If you want to see database schemas you should look at the Migration file.
 
 After Back-End tech stack we can look what I've done in the mobile application state.
 
-I did only an IOS Application with writing Swift on XCode Platform.You can also look and download IOS Project.
+I did only an IOS Application with writing Swift on XCode Platform.You can also look and download IOS Project. If you want to look the IOS Project you can visit my repos and click the CovidTrackingApp.
